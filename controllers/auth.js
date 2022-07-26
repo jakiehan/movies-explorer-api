@@ -3,7 +3,11 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const Conflict = require('../errors/Conflict');
 
-const { NODE_ENV, JWT_SECRET } = process.env;
+const { NODE_ENV, JWT_SECRET_MOVIES } = process.env;
+
+const { devConfig } = require('../utils/constants');
+
+const { JWT_SECRET_DEV } = devConfig;
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
@@ -11,7 +15,7 @@ const login = (req, res, next) => {
   return User.findUserByCredentials(email, password)
     .then((user) => {
       const { name, _id } = user;
-      const token = jwt.sign({ _id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret-movie', { expiresIn: '7d' });
+      const token = jwt.sign({ _id }, NODE_ENV === 'production' ? JWT_SECRET_MOVIES : JWT_SECRET_DEV, { expiresIn: '7d' });
       return res.send({
         name, email, token,
       });

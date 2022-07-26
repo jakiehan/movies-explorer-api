@@ -1,5 +1,6 @@
 const User = require('../models/user');
 const { checkData } = require('../middlewares/errors');
+const Conflict = require('../errors/Conflict');
 
 const currentUser = (req, res, next) => {
   const { _id } = req.user;
@@ -11,11 +12,18 @@ const currentUser = (req, res, next) => {
 const setUserInfo = (req, res, next) => {
   const { email, name } = req.body;
   const { _id } = req.user;
-  User.findByIdAndUpdate(_id, { email, name }, {
-    new: true,
-    runValidators: true,
-  })
-    .then((user) => checkData(res, user))
+  User.findOne({ email })
+    .then((userEmail) => {
+      if (userEmail) {
+        throw new Conflict('пользователь с таким email уже существует');
+      }
+      User.findByIdAndUpdate(_id, { email, name }, {
+        new: true,
+        runValidators: true,
+      })
+        .then((user) => checkData(res, user))
+        .catch(next);
+    })
     .catch(next);
 };
 
