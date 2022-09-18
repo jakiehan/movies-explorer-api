@@ -12,19 +12,17 @@ const currentUser = (req, res, next) => {
 const setUserInfo = (req, res, next) => {
   const { email, name } = req.body;
   const { _id } = req.user;
-  User.findOne({ email })
-    .then((userEmail) => {
-      if (userEmail) {
-        throw new Conflict('пользователь с таким email уже существует');
+  User.findByIdAndUpdate(_id, { email, name }, {
+    new: true,
+    runValidators: true,
+  })
+    .then((user) => checkData(res, user))
+    .catch((err) => {
+      if (err.code === 11000) {
+        return next(new Conflict('пользователь с таким email уже существует'));
       }
-      User.findByIdAndUpdate(_id, { email, name }, {
-        new: true,
-        runValidators: true,
-      })
-        .then((user) => checkData(res, user))
-        .catch(next);
-    })
-    .catch(next);
+      return next(err);
+    });
 };
 
 module.exports = { currentUser, setUserInfo };

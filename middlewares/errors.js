@@ -17,7 +17,7 @@ const handleTypeError = (err) => {
     case 'ValidationError':
       return new BadRequest(`Некорректные данные: ${err.message}`);
     case 'Unauthorized':
-      return new Unauthorized(`Ошибка: ${err.message}`);
+      return new Unauthorized(`Ошибка авторизации: ${err.message}`);
     case 'Forbidden':
       return new Forbidden(`Нет прав на совершение операции: ${err.message}`);
     case 'Conflict':

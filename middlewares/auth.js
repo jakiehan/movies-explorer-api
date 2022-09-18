@@ -11,7 +11,7 @@ module.exports = (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    return new Unauthorized('Вы не авторизованы');
+    return new Unauthorized('Токен не передан или передан не в том формате.');
   }
 
   const token = authorization.replace('Bearer ', '');
@@ -20,7 +20,7 @@ module.exports = (req, res, next) => {
   try {
     payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET_MOVIES : JWT_SECRET_DEV);
   } catch (err) {
-    throw new Unauthorized('Вы не авторизованы');
+    throw new Unauthorized('Переданный токен некорректен.');
   }
 
   req.user = payload;
